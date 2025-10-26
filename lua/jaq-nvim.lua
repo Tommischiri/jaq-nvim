@@ -111,6 +111,49 @@ local function float(cmd)
   end
 end
 
+function M.float_call()
+    -- Create the floating buffer and window
+    local buf = vim.api.nvim_create_buf(false, true)
+    local win = vim.api.nvim_open_win(buf, true, {
+        style    = "minimal",
+        relative = "editor",
+        border   = config.ui.float.border,
+        height   = dim.height,
+        width    = dim.width,
+        col      = dim.col,
+        row      = dim.row
+    })
+
+    -- Optional: window highlights and options
+    vim.api.nvim_win_set_option(win, "winhl", ("Normal:%s"):format(config.ui.float.winhl))
+    vim.api.nvim_win_set_option(win, "winhl", ("FloatBorder:%s"):format(config.ui.float.borderhl))
+    vim.api.nvim_win_set_option(win, "winblend", config.ui.float.winblend)
+
+    -- Buffer options
+    vim.api.nvim_buf_set_option(buf, "filetype", "Jaq")
+    vim.api.nvim_buf_set_keymap(buf, 'n', '<ESC>', '<cmd>lua vim.api.nvim_win_close(' .. win .. ', true)<CR>', { silent = true })
+
+    -- Handle insert mode
+    if config.behavior.startinsert then
+        vim.cmd("startinsert")
+    end
+
+    -- Handle window command
+    if config.behavior.wincmd then
+        vim.cmd("wincmd p")
+    end
+
+    -- Set up VimResized autocommand
+    vim.api.nvim_create_autocmd("VimResized", {
+        callback = function()
+            resize()  -- call your resize function here
+        end
+    })
+
+    -- Return buffer ID (and window ID if you want)
+    return buf, win
+end
+
 local function term(cmd)
   vim.cmd(config.ui.terminal.position .. " " .. config.ui.terminal.size .. "new | term " .. cmd)
 

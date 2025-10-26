@@ -112,6 +112,8 @@ local function float(cmd)
 end
 
 function M.float_call()
+    local dim = dimensions(config)
+
     -- Create the floating buffer and window
     local buf = vim.api.nvim_create_buf(false, true)
     local win = vim.api.nvim_open_win(buf, true, {

@@ -115,8 +115,8 @@ function M.float_call()
     local dim = dimensions(config)
 
     -- Create the floating buffer and window
-    local buf = vim.api.nvim_create_buf(false, true)
-    local win = vim.api.nvim_open_win(buf, true, {
+    M.buf = vim.api.nvim_create_buf(false, true)
+    M.win = vim.api.nvim_open_win(M.buf, true, {
         style    = "minimal",
         relative = "editor",
         border   = config.ui.float.border,
@@ -126,14 +126,25 @@ function M.float_call()
         row      = dim.row
     })
 
-    -- Optional: window highlights and options
-    vim.api.nvim_win_set_option(win, "winhl", ("Normal:%s"):format(config.ui.float.winhl))
-    vim.api.nvim_win_set_option(win, "winhl", ("FloatBorder:%s"):format(config.ui.float.borderhl))
-    vim.api.nvim_win_set_option(win, "winblend", config.ui.float.winblend)
+    vim.api.nvim_win_set_config(M.win, {
+        style    = "minimal",
+        relative = "editor",
+        border   = config.ui.float.border,
+        height   = dim.height,
+        width    = dim.width,
+        col      = dim.col,
+        row      = dim.row
+    })
 
-    -- Buffer options
-    vim.api.nvim_buf_set_option(buf, "filetype", "Jaq")
-    vim.api.nvim_buf_set_keymap(buf, 'n', '<ESC>', '<cmd>lua vim.api.nvim_win_close(' .. win .. ', true)<CR>', { silent = true })
+
+    vim.api.nvim_win_set_option(M.win, "winhl", ("Normal:%s"):format(config.ui.float.winhl))
+    vim.api.nvim_win_set_option(M.win, "winhl", ("FloatBorder:%s"):format(config.ui.float.borderhl))
+    vim.api.nvim_win_set_option(M.win, "winblend", config.ui.float.winblend)
+
+    vim.api.nvim_buf_set_option(M.buf, "filetype", "Jaq")
+    vim.api.nvim_buf_set_keymap(M.buf, 'n', '<ESC>', '<cmd>:lua vim.api.nvim_win_close(' .. M.win .. ', true)<CR>', { silent = true })
+
+    resize()
 
     -- Handle insert mode
     if config.behavior.startinsert then
@@ -144,13 +155,6 @@ function M.float_call()
     if config.behavior.wincmd then
         vim.cmd("wincmd p")
     end
-
-    -- Set up VimResized autocommand
-    vim.api.nvim_create_autocmd("VimResized", {
-        callback = function()
-            resize()  -- call your resize function here
-        end
-    })
 
     -- Return buffer ID (and window ID if you want)
     return buf, win

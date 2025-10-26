@@ -157,7 +157,7 @@ function M.float_call()
     end
 
     -- Return buffer ID (and window ID if you want)
-    return buf, win
+    return M.buf, M.win
 end
 
 local function term(cmd)

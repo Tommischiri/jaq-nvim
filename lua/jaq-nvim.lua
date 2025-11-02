@@ -112,11 +112,6 @@ local function float(cmd)
 end
 
 function M.float_call()
-
-    if config.behavior.autosave then
-        vim.cmd("silent write")
-    end
-
     local dim = dimensions(config)
 
     -- Create the floating buffer and window
